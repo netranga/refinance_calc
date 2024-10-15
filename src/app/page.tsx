@@ -55,7 +55,9 @@ export default function Home() {
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [newExpanded, setNewExpanded] = useState(false);
   const [currentExpanded, setCurrentExpanded] = useState(false);
-  const [interestRate, setInterestRate] = useState<number | null>(null);
+  const [interestRate, setInterestRate] = useState<string | number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedProperty) {
@@ -75,6 +77,7 @@ export default function Home() {
   }, [loanAmount, currentRate, newRate, loanTerm])
 
   useEffect(() => {
+    console.log('Component mounted, fetching interest rate...');
     fetchInterestRate();
   }, []);
 
@@ -87,16 +90,29 @@ export default function Home() {
   }, [interestRate, selectedProperty]);
 
   const fetchInterestRate = async () => {
+    console.log('Fetching interest rate...');
+    setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api');
-      if (!response.ok) {
-        throw new Error('Failed to fetch interest rate');
-      }
+      console.log('API response status:', response.status);
       const data = await response.json();
-      setInterestRate(data.interestRate);
-      setNewRate(data.interestRate); // Update newRate with the fetched interest rate
+      console.log('API response data:', data);
+      
+      if (data.interestRate !== undefined) {
+        setInterestRate(data.interestRate);
+        console.log('Interest rate set to:', data.interestRate);
+      } else if (data.error) {
+        throw new Error(data.error);
+      } else {
+        throw new Error('Invalid response from API');
+      }
     } catch (error) {
       console.error('Error fetching interest rate:', error);
+      setError(error.message || 'Failed to fetch interest rate. Please try again later.');
+    } finally {
+      setIsLoading(false);
+      console.log('Loading set to false');
     }
   };
 
@@ -148,61 +164,68 @@ export default function Home() {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-5xl font-bold mb-8 text-teal-700 text-center">Refinance Calculator</h1>
         
-        <Header interestRate={interestRate} error={null} />
+        <Header interestRate={interestRate} error={error} />
         
-        <PropertySelector onValueChange={setSelectedProperty} />
-
-        {selectedProperty ? (
+        {isLoading && <p>Loading interest rate...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        {!isLoading && !error && (
           <>
-            <PropertyDetails property={properties[selectedProperty as keyof typeof properties]} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              <PaymentBreakdown 
-                title="Current Monthly Payment" 
-                monthlyPayment={totalCurrentMonthlyPayment} 
-                mortgagePayment={currentMonthlyPayment}
-                expanded={currentExpanded}
-                setExpanded={setCurrentExpanded}
-                currentRate={currentRate}
-                newRate={newRate}
-                totalCurrentMonthlyPayment={totalCurrentMonthlyPayment}
-                totalNewMonthlyPayment={totalNewMonthlyPayment}
-                hoa={hoa}
-                propertyTax={propertyTax}
-                insurance={insurance}
-              />
-              <PaymentBreakdown 
-                title="New Monthly Payment" 
-                monthlyPayment={totalNewMonthlyPayment} 
-                mortgagePayment={newMonthlyPayment}
-                isNew={true}
-                expanded={newExpanded}
-                setExpanded={setNewExpanded}
-                currentRate={currentRate}
-                newRate={newRate}
-                totalCurrentMonthlyPayment={totalCurrentMonthlyPayment}
-                totalNewMonthlyPayment={totalNewMonthlyPayment}
-                hoa={hoa}
-                propertyTax={propertyTax}
-                insurance={insurance}
-              />
-            </div>
-            <RefinanceBenefits 
-              totalCurrentMonthlyPayment={totalCurrentMonthlyPayment}
-              totalNewMonthlyPayment={totalNewMonthlyPayment}
-              currentRate={currentRate}
-              newRate={newRate}
-              loanAmount={loanAmount}
-              loanTerm={loanTerm}
-            />
-            <LoanAmortization chartData={chartData} />
+            <PropertySelector onValueChange={setSelectedProperty} />
+
+            {selectedProperty ? (
+              <>
+                <PropertyDetails property={properties[selectedProperty as keyof typeof properties]} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <PaymentBreakdown 
+                    title="Current Monthly Payment" 
+                    monthlyPayment={totalCurrentMonthlyPayment} 
+                    mortgagePayment={currentMonthlyPayment}
+                    expanded={currentExpanded}
+                    setExpanded={setCurrentExpanded}
+                    currentRate={currentRate}
+                    newRate={newRate}
+                    totalCurrentMonthlyPayment={totalCurrentMonthlyPayment}
+                    totalNewMonthlyPayment={totalNewMonthlyPayment}
+                    hoa={hoa}
+                    propertyTax={propertyTax}
+                    insurance={insurance}
+                  />
+                  <PaymentBreakdown 
+                    title="New Monthly Payment" 
+                    monthlyPayment={totalNewMonthlyPayment} 
+                    mortgagePayment={newMonthlyPayment}
+                    isNew={true}
+                    expanded={newExpanded}
+                    setExpanded={setNewExpanded}
+                    currentRate={currentRate}
+                    newRate={newRate}
+                    totalCurrentMonthlyPayment={totalCurrentMonthlyPayment}
+                    totalNewMonthlyPayment={totalNewMonthlyPayment}
+                    hoa={hoa}
+                    propertyTax={propertyTax}
+                    insurance={insurance}
+                  />
+                </div>
+                <RefinanceBenefits 
+                  totalCurrentMonthlyPayment={totalCurrentMonthlyPayment}
+                  totalNewMonthlyPayment={totalNewMonthlyPayment}
+                  currentRate={currentRate}
+                  newRate={newRate}
+                  loanAmount={loanAmount}
+                  loanTerm={loanTerm}
+                />
+                <LoanAmortization chartData={chartData} />
+              </>
+            ) : (
+              <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 shadow-lg mb-8">
+                <CardContent className="p-8 text-center">
+                  <p className="text-xl text-teal-700 mb-4">Please select a property to view details and calculate refinance options.</p>
+                </CardContent>
+              </Card>
+            )}
           </>
-        ) : (
-          <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 shadow-lg mb-8">
-            <CardContent className="p-8 text-center">
-              <p className="text-xl text-teal-700 mb-4">Please select a property to view details and calculate refinance options.</p>
-            </CardContent>
-          </Card>
         )}
+        <p>Debug: isLoading = {isLoading.toString()}, interestRate = {JSON.stringify(interestRate)}, error = {JSON.stringify(error)}</p>
       </div>
     </div>
   )

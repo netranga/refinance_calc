@@ -7,24 +7,41 @@ export async function GET() {
     return NextResponse.json({ error: 'API key not found' }, { status: 500 });
   }
 
-  const response = await fetch('https://api.perplexity.ai/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'llama-3.1-sonar-small-128k-online',
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant that provides the current average 30-year fixed mortgage interest rate in the US.' },
-        { role: 'user', content: 'What is the current average 30-year fixed mortgage interest rate in the US? Please respond with only the number, rounded to two decimal places.' }
-      ]
-    })
-  });
+  try {
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-sonar-small-128k-online',
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that provides the current average 30-year fixed mortgage interest rate in the US.' },
+          { role: 'user', content: 'What is the current average 30-year fixed mortgage interest rate in NC? Please respond with only the number, rounded to two decimal places.' }
+        ]
+      })
+    });
 
-  const data = await response.json();
-  const interestRate = parseFloat(data.choices[0].message.content);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-  return NextResponse.json({ interestRate });
+    const data = await response.json();
+    console.log('Perplexity API response:', data);
+
+    const interestRate = parseFloat(data.choices[0].message.content);
+
+    if (isNaN(interestRate)) {
+      throw new Error('Invalid interest rate received');
+    }
+
+    return NextResponse.json({ interestRate });
+  } catch (error) {
+    console.error('Error in API route:', error);
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: 'Failed to fetch interest rate' }, { status: 500 });
+  }
 }
-

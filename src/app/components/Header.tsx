@@ -17,14 +17,18 @@ const Header: React.FC<HeaderProps> = ({ interestRate, error }) => {
       <CardContent>
         <div className="flex items-center justify-between">
           <p className="text-6xl font-bold text-white">
-            {error ? 'Error' : interestRate ? `${interestRate.toFixed(2)}%` : 'Loading...'}
+            {error ? 'Error' : interestRate !== null ? `${interestRate}%` : 'N/A'}
           </p>
           <Badge variant="outline" className="text-white border-white">
             <TrendingDown className="mr-2" />
-            <span>{error ? 'Failed to update' : 'Updated today'}</span>
+            <span>{error ? 'Failed to update' : interestRate !== null ? 'Updated today' : 'Not available'}</span>
           </Badge>
         </div>
         {error && <p className="text-red-200 mt-2">{error}</p>}
+        <p className="text-white mt-2">
+          Debug: interestRate = {interestRate !== null ? JSON.stringify(interestRate) : 'null'}, 
+          error = {error !== null ? error : 'null'}
+        </p>
       </CardContent>
     </Card>
   );
