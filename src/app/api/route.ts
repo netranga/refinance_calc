@@ -18,7 +18,7 @@ export async function GET() {
         model: 'llama-3.1-sonar-small-128k-online',
         messages: [
           { role: 'system', content: 'You are a helpful assistant that provides the current average 30-year fixed mortgage interest rate in the US.' },
-          { role: 'user', content: 'What is the current average 30-year fixed mortgage interest rate in NC? Please respond with only the number, rounded to two decimal places.' }
+          { role: 'user', content: 'What is the current average 30-year fixed mortgage interest rate in NC? Please respond with only the number, rounded to three decimal places.' }
         ]
       })
     });
