@@ -1,8 +1,34 @@
 # Refinance Calculator
 
-## Overview
+---
 
-This Refinance Calculator is a web application designed to help homeowners evaluate the potential benefits of refinancing their mortgage. It provides a user-friendly interface for inputting property details and current mortgage information, then calculates and displays the potential savings and benefits of refinancing.
+This project is a custom **Refinance Calculator** app designed to help my boyfriend and me quickly assess how the current market rate affects our refinancing options for our homes. The calculator provides a breakdown of monthly payment adjustments, total savings, and an amortization schedule based on the latest market interest rate fetched from the Perplexity API.
+
+The focus of this app is on simplicity, tailored usability, and clean, interactive design to showcase my front-end development skills.
+
+---
+
+## Features
+
+- **Current Market Rate**: The top of the app displays the latest refinance interest rate, automatically updated via the Perplexity API.
+- **Home Selection Dropdown**: Switch between details for each home (mine and Tristan's) with a dropdown menu.
+- **Detailed Loan Summary**: For each selected home, the calculator shows:
+  - Loan Amount
+  - Current Rate
+  - New Rate (based on the fetched market rate)
+  - Loan Term (fixed at 30 years for this version)
+- **Monthly Payment Comparison**: Calculates and compares current and new monthly payments, showing the estimated savings if refinanced at the new rate.
+- **Refinance Benefits Summary**: Summarizes projected total savings, interest rate reduction, and the break-even point.
+- **Amortization Schedule**: A graphical comparison of the loan payoff trajectory under the current vs. refinanced rates.
+
+---
+
+## Roadmap
+
+- [ ] **Design Enhancements**: Make the interface more interactive and visually appealing. Future updates will include dynamic animations and possibly a more sophisticated background.
+- [ ] **Refinance Calculations**: Double-check all calculations for accuracy in projecting potential savings, breakeven point, and ammorization schedule.
+- [ ] **User Input Feature**: Eventually allow users to input their values to customize loan information, but this will be a later enhancement.
+
 
 ## How It Works
 
@@ -21,7 +47,7 @@ The application is built using Next.js and React, with a server-side API for fet
    - Calculates and displays the potential benefits of refinancing based on user inputs and current interest rates.
 
 5. **API Routes**
-   - `/interest-rate/route.ts`: Fetches current interest rates from Perplexity API
+   - Fetches current interest NC 30 year interest rates using Perplexity API
 
 6. **Main Page (page.tsx)**
    - Orchestrates the overall layout and flow of the application, combining all the components.
@@ -48,13 +74,3 @@ To run the Refinance Calculator locally for development:
    ```
 
 4. Open your browser and navigate to `http://localhost:3000`
-
-The application should now be running on your local machine. Any changes you make to the code will be automatically reflected in the browser.
-
-## Future Development Ideas
-
-1. **Loan Comparison Tool**: Allow users to compare multiple refinancing options side-by-side.
-
-2. **Amortization Schedule**: Generate and display a detailed amortization schedule for both current and refinanced loans.
-
-3. **Refinance Breakeven Calculator**: Calculate how long it will take for the refinance to pay for itself.
