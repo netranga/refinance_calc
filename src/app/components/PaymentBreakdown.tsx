@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChevronUp, ChevronDown, ArrowRight } from 'lucide-react'
+import { ChevronUp, ChevronDown, ArrowRight, DollarSign, Building, FileText, Shield } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 interface PaymentBreakdownProps {
   title: string;

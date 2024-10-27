@@ -84,8 +84,9 @@ export default function Home() {
   useEffect(() => {
     if (interestRate !== null && selectedProperty) {
       const property = properties[selectedProperty as keyof typeof properties];
-      setNewRate(interestRate);
-      property.newRate = interestRate;
+      const numericRate = Number(interestRate);
+      setNewRate(numericRate);
+      property.newRate = numericRate;
     }
   }, [interestRate, selectedProperty]);
 
